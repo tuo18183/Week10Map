@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            display: inline-block;
+            margin-right: 20px;
+            color: #001323;
+        }
+        h2 {
+            display: inline-block;
+            color: #001323;
+        }
+        #map {
+            width: 80%;
+            height: 540px;
+            margin: 10px auto;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+       
+        
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1> My Hidden Location </h1>
+        <h2>An Interactive GIS Game</h2>
+    </header>
+
+    <div id='map'></div>
+
+    <footer>
+        <p>Map by Ellis Stafford Moore</p>
+        <p> Find The NHL Team's Arena </p>
+        <p> Hint: My third favorite team after Flyers and Bruins (West)</p>
+    </footer>
+
+    <script>
+           
+    var options = {
+            center: [40, 40],
+            zoom: 2
+    }
+    
+    var map = L.map('map', options);
+
+    map.setMinZoom(1);
+    
+    var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      maxZoom: 18,
+      id: 'mapbox/dark-v11',
+      tileSize: 512,
+      zoomOffset: -1,
+      accessToken: 'pk.eyJ1IjoidHVvMTgxODMiLCJhIjoiY2xzbW5qbjQ3MHAyMTJpbGZrdXhjb245ZSJ9.ytBZNsdFeSARGKOpIYUCNw'
+    });
+        
+    map.addLayer(tiles);
+    
+   var tajMarker = L.latLng(36.10286669221971, -115.17819366268253); 
+   var hiddenMarker = L.marker(tajMarker, {
+        icon : L.icon({
+            iconUrl: 'taj.png',
+            iconSize: [40, 36]
+        }),
+        opacity: 0
+    }).addTo(map);
+                 
+    
+var markers = L.layerGroup().addTo(map); 
+        
+        
+   map.on('click', function(e){ // 
+       
+       
+        markers.clearLayers()
+   
+       var clickCoord = e.latlng; 
+       console.log(e.latlng)
+       var marker = L.marker(clickCoord, { 
+              
+        });
+       
+       marker.addTo(markers) 
+       
+       var miles = calcDistance(tajMarker, clickCoord)
+  console.log(miles) //
+      
+       var popupContent;
+
+    if(miles/1609.34 > 1250) {
+        popupContent = "Theodore takes the puck behind the endline...";
+    }
+    else if(miles/1609.34 < 1250 && miles/1609.34 >= 700) {
+        popupContent = "Passes it to McNabb at the blue line...";
+    }
+    else if(miles/1609.34 < 700 && miles/1609.34 >= 500) {
+        popupContent = "Moving through the zone, quick pass to Smith...";
+
+    } else if(miles/1609.34 < 500 && miles/1609.34 >= 200) {
+        popupContent = "Flips it forward to Karlsson...";
+        
+    } else if(miles/1609.34 < 200 && miles/1609.34 >= 0.9) {
+        popupContent = "Karlsson to Marchessault, he fires! ";
+
+    } else if(miles/1609.34 < 0.9){
+        marker.setOpacity(0);
+        hiddenMarker.setOpacity(100);
+        popupContent = "HE SCORES! And the Vegas Golden Knights are Stanley Cup Champions! ";
+    }
+    
+    marker.bindPopup(popupContent + "Miles from home:" + (miles/1609.34).toLocaleString()).openPopup();
+    popup().setContent(popupContent);
+
+});  
+        function calcDistance(tajMarker, click) {  
+            var distance = tajMarker.distanceTo(click)
+            return distance
+        }
+        
+    </script>
+    
+</body>
+
+</html>
